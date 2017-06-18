@@ -328,13 +328,13 @@ xstore3=[x - x_mean for x in xstore2]
 ystore3=[x - y_mean for x in ystore2]
 fig, ax = plt.subplots()
 # Plot the data
-data_line = ax.plot(frameno2, xstore3, label='Deviation of pixels in x direction from mean'+str(round(y_mean)))
+data_line = ax.plot(frameno2, xstore3, label='Deviation of pixels in x direction from mean'+str(round(x_mean)))
 # Plot the average line
 mean_line = ax.plot(frameno2, x_mean2, label='Mean-x', linestyle='--')
 # Make a legend
 legend = ax.legend(loc='lower right')
 plt.xlabel('time(sec)', fontsize=18)
-plt.ylabel('Deviation(No of Pixels', fontsize=16)
+plt.ylabel('Deviation(No of Pixels)', fontsize=16)
 fig2, ax2 = plt.subplots()
 # Plot the data
 data_line2 = ax2.plot(frameno2, ystore3, label='Deviation of pixels in y direction from mean '+str(round(y_mean)))
@@ -343,9 +343,9 @@ mean_line2 = ax2.plot(frameno2, y_mean2, label='Mean-y', linestyle='--')
 # Make a legend
 legend2 = ax2.legend(loc='lower right')
 plt.xlabel('time(sec)', fontsize=18)
-plt.ylabel('Deviation(No of pixels', fontsize=16)
+plt.ylabel('Deviation(No of pixels)', fontsize=16)
 plt.draw()
-plt.pause(5)
+plt.pause(15)
 plt.close('all')
 
 cap.release()
