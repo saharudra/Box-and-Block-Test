@@ -32,7 +32,12 @@ no = 0
 xstore=[]
 ystore=[]
 frameno=[]
-j=0
+j, frame_c = 0, 0
+blueCount = 0
+yellowCount = 0
+greenCount = 0
+redCount = 0
+tuple_array = []
 
 while cap.isOpened():
     # Take each frame
@@ -52,7 +57,7 @@ while cap.isOpened():
         # Red Mask
         # define range of red color in HSV
         lower_red = np.array([0, 100, 100])
-        upper_red = np.array([6, 255, 255])
+        upper_red = np.array([5, 255, 255])
 
         redMask = cv2.inRange(hsv,lower_red,upper_red)
         # cv2.imshow("RedMask", redMask)
@@ -60,10 +65,11 @@ while cap.isOpened():
         # Blue Mask
 
         # define range of blue color in HSV
-        lower_blue = np.array([105, 70, 50])
+        lower_blue = np.array([75, 80, 50])
         upper_blue = np.array([135, 255, 255])
         blueMask = cv2.inRange(hsv, lower_blue, upper_blue)
-        # cv2.imshow("blueMask", blueMask)
+        cv2.imshow("blueMask", blueMask)
+
         # Yellow Mask
 
         # define range of yellow color in HSV
@@ -102,7 +108,7 @@ while cap.isOpened():
             redPeri = cv2.arcLength(c, True)
             redApprox = cv2.approxPolyDP(c, 0.08*redPeri, True)
             redArea = cv2.contourArea(c)
-            if redArea > 100:
+            if redArea > 200:
                 #cv2.drawContours(frame, [redApprox],-1,(255, 255,255),4)
                 x, y, w, h = cv2.boundingRect(c)
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255, 255, 255), 2)
@@ -116,7 +122,7 @@ while cap.isOpened():
             bluePeri = cv2.arcLength(c, True)
             blueApprox = cv2.approxPolyDP(c, 0.08* bluePeri, True)
             blueArea=cv2.contourArea(c)
-            if blueArea > 300:
+            if blueArea > 200:
                 #cv2.drawContours(frame, [blueApprox], -1, (255, 255, 0), 4)
                 x, y, w, h = cv2.boundingRect(c)
                 w = 32
@@ -150,6 +156,25 @@ while cap.isOpened():
                 h = 32
                 cv2.rectangle(frame, (x, y), (x + w, y + h), (255,0, 255), 2)
                 yellowTotal = yellowTotal + 1
+        if (yellowTotal < yellowCount):
+            yellowTotal = yellowCount
+        else:
+            yellowCount = yellowTotal
+
+        if (blueTotal < blueCount):
+            blueTotal = blueCount
+        else:
+            blueCount = blueTotal
+
+        if (greenTotal < greenCount):
+            greenTotal = greenCount
+        else:
+            greenCount = greenTotal
+
+        if (redTotal < redCount):
+            redTotal = redCount
+        else:
+            redCount = redTotal
 
         total = blueTotal + greenTotal + yellowTotal + redTotal
         # if(currTotal > total):
@@ -248,6 +273,20 @@ while cap.isOpened():
         j = j + 1
         frameno.append(j)
 
+        tuple_array.append(tuple((cx, cy)))
+        frame_c = frame_c + 1
+        if frame_c < 100:
+            # Need to write into pts all the values of xstore and ystore in the form of (xstore[0],ystore[0]) , (xstore[1],ystore[1]) and so on
+
+            pts = np.array(tuple_array, np.int32)
+            pts = pts.reshape((-1, 1, 2))
+
+            cv2.polylines(frame, [pts], False, (255, 255, 255), thickness=3, lineType=cv2.CV_AA)
+
+            if frame_c == 99:
+                frame_c = 0
+                tuple_array = []
+
         # Draw center mass
         cv2.circle(frame,centerMass,7,[100,0,255],2)
         cv2.putText(frame,'Center',tuple(centerMass),font,2,(255,255,255),2)
@@ -345,7 +384,7 @@ legend2 = ax2.legend(loc='lower right')
 plt.xlabel('time(sec)', fontsize=18)
 plt.ylabel('Deviation(No of pixels)', fontsize=16)
 plt.draw()
-plt.pause(15)
+plt.pause(3)
 plt.close('all')
 
 cap.release()
